@@ -43,7 +43,7 @@ fun App() {
                     TopIconRow()
                 }
 
-                AddressBar(searchActive = searchActive) {
+                HomeAddressBar(searchActive = searchActive) {
                     searchActive = it
                 }
 

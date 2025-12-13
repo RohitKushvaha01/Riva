@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -22,7 +23,7 @@ import com.composables.icons.lucide.Search
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddressBar(searchActive: Boolean,onActiveChange:(Boolean)-> Unit){
+fun HomeAddressBar(searchActive: Boolean,onActiveChange:(Boolean)-> Unit){
     var searchQuery by remember { mutableStateOf("") }
 
 
@@ -46,14 +47,18 @@ fun AddressBar(searchActive: Boolean,onActiveChange:(Boolean)-> Unit){
                 onSearch = { onActiveChange(false) },
                 expanded = searchActive,
                 onExpandedChange = onActiveChange,
-                placeholder = { Text("Search") },
+                placeholder = { Text("Search or type URL") },
                 colors = colors1.inputFieldColors,
                 leadingIcon = {
                     Icon(modifier = Modifier.size(22.dp), imageVector = Lucide.Search, contentDescription = null)
                 },
                 trailingIcon = {
                     if (searchActive && searchQuery.isNotEmpty()){
-                        Icon(modifier = Modifier.size(22.dp), imageVector = Lucide.CircleStop, contentDescription = null)
+                        IconButton(onClick = {
+                            searchQuery = ""
+                        }){
+                            Icon(modifier = Modifier.size(22.dp), imageVector = Lucide.CircleStop, contentDescription = null)
+                        }
                     }
                 }
             )
