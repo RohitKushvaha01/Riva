@@ -32,7 +32,7 @@ fun HomeAddressBar(searchActive: Boolean,onActiveChange:(Boolean)-> Unit){
     }
 
     // 🔹 Search bar (moves to top)
-    val topPadding by animateDpAsState(
+    val padding by animateDpAsState(
         targetValue = if (searchActive) 0.dp else 16.dp,
         label = "searchPadding"
     )
@@ -67,8 +67,8 @@ fun HomeAddressBar(searchActive: Boolean,onActiveChange:(Boolean)-> Unit){
         onExpandedChange = onActiveChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = if (searchActive){0.dp}else{16.dp})
-            .padding(top = topPadding),
+            .padding(horizontal = padding)
+            .padding(top = padding),
         shape = SearchBarDefaults.inputFieldShape,
         colors = colors1,
         windowInsets = SearchBarDefaults.windowInsets,

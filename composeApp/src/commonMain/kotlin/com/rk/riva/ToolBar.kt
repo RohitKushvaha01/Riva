@@ -13,6 +13,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,7 +26,7 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Menu
 
 @Composable
-fun TopIconRow() {
+fun ToolBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,8 +60,18 @@ fun TopIconRow() {
             Icon(Lucide.Dice1, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurface)
         }
 
-        IconButton(onClick = {}) {
-            Icon(Lucide.Menu, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurface)
+
+        var expanded by remember { mutableStateOf(false) }
+        Box{
+            IconButton(onClick = {
+                expanded = true
+            }) {
+                Icon(Lucide.Menu, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurface)
+            }
+            MainMenu(show = expanded){
+                expanded = false
+            }
         }
+
     }
 }

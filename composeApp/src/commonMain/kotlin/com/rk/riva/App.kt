@@ -10,14 +10,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.composables.icons.lucide.LogOut
+import com.composables.icons.lucide.Lucide
 import com.rk.riva.theme.RivaTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -33,14 +40,14 @@ fun App() {
                     .safeContentPadding()
                     .fillMaxSize()
             ) {
-                var searchActive by remember { mutableStateOf(false) }
+                var searchActive by rememberSaveable { mutableStateOf(false) }
 
                 AnimatedVisibility(
                     visible = !searchActive,
                     enter = fadeIn() + expandVertically(),
                     exit = fadeOut() + shrinkVertically()
                 ) {
-                    TopIconRow()
+                    ToolBar()
                 }
 
                 HomeAddressBar(searchActive = searchActive) {
@@ -51,9 +58,11 @@ fun App() {
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-
+                    // content?
                 }
             }
+
+
         }
     }
 
