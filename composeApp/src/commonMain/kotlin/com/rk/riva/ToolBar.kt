@@ -24,18 +24,26 @@ import com.composables.icons.lucide.Dice1
 import com.composables.icons.lucide.House
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Menu
+import com.rk.riva.TabManager.currentTab
 
 @Composable
 fun ToolBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = {}) {
+        IconButton(onClick = {
+            TabManager.replaceTab(currentTab, HomeTab())
+        }) {
             Icon(Lucide.House, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurface)
         }
+
+
+//        HomeAddressBar(modifier = Modifier
+//            .weight(1f)
+//            ,false, onActiveChange = {})
 
         Spacer(Modifier.weight(1f))
 

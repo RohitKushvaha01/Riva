@@ -30,22 +30,37 @@ fun MainMenu(show: Boolean,onDismissRequest:()-> Unit){
     }){
         Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Top) {
             //go forward
-            IconButton(onClick = {}){
+            IconButton(
+                enabled = ((TabManager.currentTab as? WebTab)?.getEngine()?.canGoForward?.value == true),
+                onClick = {
+                    onDismissRequest()
+                (TabManager.currentTab as? WebTab)?.getEngine()?.goForward()
+            }){
                 Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.ArrowRight, contentDescription = null)
             }
-            IconButton(onClick = {}){
-                //use filled star?
+            IconButton(onClick = {
+                onDismissRequest()
+            }){
                 Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Bookmark,contentDescription = null)
             }
             //page info
-            IconButton(onClick = {}){
+            IconButton(onClick = {
+                onDismissRequest()
+            }){
                 Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Info,contentDescription = null)
             }
-            IconButton(onClick = {}){
+            IconButton(onClick = {
+                onDismissRequest()
+            }){
                 Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Download,contentDescription = null)
             }
 
-            IconButton(onClick = {}){
+            IconButton(
+                enabled = TabManager.currentTab is WebTab,
+                onClick = {
+                    onDismissRequest()
+                (TabManager.currentTab as? WebTab)?.getEngine()?.refresh()
+            }){
                 Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.RefreshCw,contentDescription = null)
             }
         }
@@ -54,6 +69,7 @@ fun MainMenu(show: Boolean,onDismissRequest:()-> Unit){
             text = { Text("New Tab") },
             onClick = {
                onDismissRequest()
+                TabManager.newTab(tab = HomeTab())
             },
             leadingIcon = {
                 Icon(Lucide.Plus, contentDescription = null)
