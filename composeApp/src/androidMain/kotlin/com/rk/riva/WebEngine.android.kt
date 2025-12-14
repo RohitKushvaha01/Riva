@@ -1,5 +1,7 @@
 package com.rk.riva
 
+import android.app.Activity
+import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
@@ -12,8 +14,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.drawable.toDrawable
 import java.lang.ref.WeakReference
 
 actual fun getPlatformEngines(): List<WebEngine> {
@@ -43,12 +48,16 @@ class DefaultEngine : WebEngine {
     @Composable
     override fun Content(modifier: Modifier) {
         val context = LocalContext.current
-        var isWebViewReady by remember { mutableStateOf(false) }
+
+        val backgroundColor = MaterialTheme.colorScheme.surface
 
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
                 WebView(ctx).apply {
+                    background = backgroundColor.toArgb().toDrawable()
+                    this.setBackgroundColor(backgroundColor.toArgb())
+                    visibility = View.INVISIBLE
                     webViewClient = object : WebViewClient() {
                         override fun onPageStarted(
                             view: WebView?,
@@ -84,7 +93,7 @@ class DefaultEngine : WebEngine {
                     }
 
                     webView = WeakReference(this)
-                    isWebViewReady = true
+                    visibility = View.VISIBLE
                 }
             },
             update = { view ->
@@ -92,12 +101,9 @@ class DefaultEngine : WebEngine {
             }
         )
 
-        if (!isWebViewReady) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-            )
+        LaunchedEffect(MaterialTheme.colorScheme.surface) {
+            webView.get()?.background = backgroundColor.toArgb().toDrawable()
+            webView.get()?.setBackgroundColor(backgroundColor.toArgb())
         }
 
         DisposableEffect(Unit) {

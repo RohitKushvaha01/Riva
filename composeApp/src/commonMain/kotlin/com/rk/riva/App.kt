@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.rk.riva.TabManager.currentTab
@@ -23,43 +24,47 @@ import com.rk.riva.theme.RivaTheme
 @Composable
 fun App() {
     RivaTheme {
-        Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
-            Column(
-                modifier = Modifier
-                    .safeContentPadding()
-                    .fillMaxSize()
-            ) {
-
-                AnimatedVisibility(
-                    visible = currentTab.showToolBar.value,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
-                ) {
-                    ToolBar()
-                }
-
-                if (currentTab.showToolBar.value){
-                    HorizontalDivider()
-                }
-
-
-
-                //tab content
-                Box(
+        setWindowBackground(color = MaterialTheme.colorScheme.surface)
+        Surface {
+            Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+                Column(
                     modifier = Modifier
+                        .safeContentPadding()
                         .fillMaxSize()
                 ) {
-                    currentTab.Content()
+
+                    AnimatedVisibility(
+                        visible = currentTab.showToolBar.value,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        ToolBar()
+                    }
+
+                    if (currentTab.showToolBar.value && currentTab !is HomeTab){
+                        HorizontalDivider()
+                    }
+
+
+
+                    //tab content
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        currentTab.Content()
+                    }
+
+
+
+
+
                 }
-
-
-
 
 
             }
-
-
         }
+
     }
 
 }
