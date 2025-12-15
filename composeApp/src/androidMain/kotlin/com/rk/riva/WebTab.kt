@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,7 +34,6 @@ import kotlinx.coroutines.delay
 import org.json.JSONObject
 import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
-import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoView
 import org.mozilla.geckoview.WebResponse
@@ -180,7 +178,10 @@ class TabSession(context: android.content.Context, initialUrl: String = "about:b
 class WebTab() : BaseTab() {
 
     private var initUrl by mutableStateOf("about:blank")
-    private var tabSession: TabSession? = null
+    private var session: TabSession? = null
+    private var geckoView: GeckoView? = null
+    private var isInitialized = false
+    private val tabId = java.util.UUID.randomUUID().toString()
 
     constructor(url: String) : this() {
         this.initUrl = url
@@ -188,84 +189,116 @@ class WebTab() : BaseTab() {
 
     override var showToolBar: MutableState<Boolean> = mutableStateOf(true)
 
+    // Initialize session immediately when tab is created
+    fun initializeSession(context: android.content.Context) {
+        if (session == null) {
+            session = TabSession(context, initUrl).apply {
+                if (initUrl != "about:blank") {
+                    loadUrl(initUrl)
+                }
+            }
+        }
+    }
+
     @Composable
     override fun Content() {
         val context = LocalContext.current
 
-        // Create session once
-        val session = remember {
-            TabSession(context, initUrl).also {
-                tabSession = it
-            }
-        }
+        initializeSession(context)
+
+        val currentSession = session!!
 
         BackHandler(enabled = currentTab == this) {
-            if (session.canGoBack.value) {
-                session.goBack()
+            if (currentSession.canGoBack.value) {
+                currentSession.goBack()
             }
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            ProgressBar(isLoading = session.isLoading.value)
+            ProgressBar(isLoading = currentSession.isLoading.value)
 
-            GeckoViewContent(
-                session = session,
-                modifier = Modifier.weight(1f)
-            )
+            val backgroundColor = MaterialTheme.colorScheme.surface
 
-            LaunchedEffect(Unit) {
-                if (initUrl != "about:blank") {
-                    session.loadUrl(initUrl)
-                }
-            }
-        }
-
-        DisposableEffect(Unit) {
-            onDispose {
-                // Clean up the session when tab is closed
-                tabSession?.close()
-                tabSession = null
+            key(tabId){
+                AndroidView(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize(),
+                    factory = { ctx ->
+                        // Reuse existing GeckoView or create new one
+                        geckoView ?: GeckoView(ctx).apply {
+                            setBackgroundColor(backgroundColor.toArgb())
+                            setSession(currentSession.session)
+                            geckoView = this
+                        }
+                    },
+                    update = { view ->
+                        // Only update background color, don't recreate session
+                        view.setBackgroundColor(backgroundColor.toArgb())
+                    }
+                )
             }
         }
     }
 
-    fun getSession(): TabSession? = tabSession
+    fun getSession(): TabSession? = session
 
     override fun getTitle(): String {
-        return tabSession?.pageTitle?.value ?: "New Tab"
+        return session?.pageTitle?.value ?: "New Tab"
     }
 
     override fun onClose() {
-        tabSession?.close()
+        geckoView?.releaseSession()
+        geckoView = null
+        session?.close()
+        session = null
     }
 
     @Composable
-    override fun ColumnScope.MenuItems(onDismissRequest:()-> Unit) {
-        Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Top) {
-            //go forward
+    override fun ColumnScope.MenuItems(onDismissRequest: () -> Unit) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Top
+        ) {
             IconButton(
                 enabled = getSession()?.canGoForward?.value == true,
                 onClick = {
                     onDismissRequest()
                     getSession()?.goForward()
-                }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.ArrowRight, contentDescription = null)
+                }
+            ) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Lucide.ArrowRight,
+                    contentDescription = null
+                )
             }
             IconButton(onClick = {
                 onDismissRequest()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Bookmark,contentDescription = null)
-            }
-            //page info
-            IconButton(onClick = {
-                onDismissRequest()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Info,contentDescription = null)
+            }) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Lucide.Bookmark,
+                    contentDescription = null
+                )
             }
             IconButton(onClick = {
                 onDismissRequest()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Download,contentDescription = null)
+            }) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Lucide.Info,
+                    contentDescription = null
+                )
+            }
+            IconButton(onClick = {
+                onDismissRequest()
+            }) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Lucide.Download,
+                    contentDescription = null
+                )
             }
 
             IconButton(
@@ -273,43 +306,15 @@ class WebTab() : BaseTab() {
                 onClick = {
                     onDismissRequest()
                     getSession()?.reload()
-                }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.RefreshCw,contentDescription = null)
+                }
+            ) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Lucide.RefreshCw,
+                    contentDescription = null
+                )
             }
         }
-
-    }
-}
-
-@Composable
-fun GeckoViewContent(
-    session: TabSession,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    val backgroundColor = MaterialTheme.colorScheme.surface
-    var geckoView by remember { mutableStateOf<GeckoView?>(null) }
-
-    AndroidView(
-        modifier = modifier.fillMaxSize(),
-        factory = { ctx ->
-            GeckoView(ctx).apply {
-                setBackgroundColor(backgroundColor.toArgb())
-                setSession(session.session)
-                geckoView = this
-            }
-        },
-        update = { view ->
-            view.setBackgroundColor(backgroundColor.toArgb())
-            // Ensure session is set (in case of recomposition)
-            if (view.session != session.session) {
-                view.setSession(session.session)
-            }
-        }
-    )
-
-    LaunchedEffect(backgroundColor) {
-        geckoView?.setBackgroundColor(backgroundColor.toArgb())
     }
 }
 

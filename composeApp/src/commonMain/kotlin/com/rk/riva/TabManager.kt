@@ -27,6 +27,7 @@ object TabManager {
     fun removeTab(tab: BaseTab) {
         if (_tabs.size == 1) {
             // Don't allow removing the last tab, replace it with HomeTab
+            _tabs[0].onClose()
             val newHome = HomeTab()
             _tabs[0] = newHome
             _currentTab = newHome
@@ -35,6 +36,8 @@ object TabManager {
 
         val index = _tabs.indexOf(tab)
         if (index == -1) return // Tab not found
+
+        tab.onClose()
 
         _tabs.removeAt(index)
 
@@ -46,6 +49,7 @@ object TabManager {
     }
 
     fun clearTabs() {
+        _tabs.forEach { it.onClose() }
         _tabs.clear()
         val newHome = HomeTab()
         _tabs.add(newHome)
@@ -54,6 +58,8 @@ object TabManager {
 
     fun replaceTab(thisTab: BaseTab, toThis: BaseTab) {
         if (thisTab == toThis) return
+
+        thisTab.onClose()
 
         val index = _tabs.indexOf(thisTab)
         if (index == -1) return // Tab not found

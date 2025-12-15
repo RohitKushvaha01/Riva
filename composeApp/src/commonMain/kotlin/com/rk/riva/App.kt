@@ -158,7 +158,7 @@ fun TabChip(
     Surface(
         modifier = modifier
             .height(40.dp)
-            .widthIn(min = 80.dp, max = 200.dp)
+            .widthIn(min = 45.dp, max = 80.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable(onClick = onClick),
         color = backgroundColor,
@@ -195,87 +195,3 @@ fun TabChip(
         }
     }
 }
-
-// Alternative: Compact Tab Row with Tab Count
-@Composable
-fun CompactBottomTabRow(
-    tabs: List<BaseTab>,
-    currentTab: BaseTab,
-    onTabClick: (BaseTab) -> Unit,
-    onTabClose: (BaseTab) -> Unit,
-    onNewTab: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        tonalElevation = 3.dp,
-        shadowElevation = 8.dp
-    ) {
-        Column {
-            HorizontalDivider()
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Tab count badge
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.secondaryContainer
-                ) {
-                    Text(
-                        text = "${tabs.indexOf(currentTab) + 1}/${tabs.size}",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
-
-                // Current tab title
-                Text(
-                    text = currentTab.getTitle(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 12.dp)
-                )
-
-                // Action buttons
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    // Close current tab
-                    if (tabs.size > 1) {
-                        FilledTonalIconButton(
-                            onClick = { onTabClose(currentTab) },
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                imageVector = Lucide.X,
-                                contentDescription = "Close Tab",
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-
-                    // New tab
-                    FilledTonalIconButton(
-                        onClick = onNewTab,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Lucide.Plus,
-                            contentDescription = "New Tab",
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Usage Example:
-// Replace BottomTabRow() in App() with CompactBottomTabRow() for a more compact design
