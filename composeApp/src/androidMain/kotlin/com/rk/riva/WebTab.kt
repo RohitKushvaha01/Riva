@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -360,7 +361,7 @@ fun ProgressBar(
     // Only show when there's progress or loading
     if (isLoading || (targetProgress > 0f && targetProgress < 1f)) {
         LinearProgressIndicator(
-            progress = { animatedProgress },
+            progress = { if (isLoading){animatedProgress}else{0f} },
             modifier = modifier
                 .fillMaxWidth()
                 .height(2.dp),

@@ -64,10 +64,6 @@ fun ToolBar() {
             }
         }
 
-        IconButton(onClick = {}) {
-            Icon(Lucide.Dice1, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurface)
-        }
-
 
         var expanded by remember { mutableStateOf(false) }
         Box{

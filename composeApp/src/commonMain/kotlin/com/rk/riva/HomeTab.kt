@@ -33,11 +33,11 @@ class HomeTab() : BaseTab() {
     }
 
     override fun getTitle(): String {
-        TODO("Not yet implemented")
+       return "Home"
     }
 
     override fun onClose() {
-        TODO("Not yet implemented")
+
     }
 
     @Composable
