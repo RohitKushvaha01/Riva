@@ -25,6 +25,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        maven("https://maven.mozilla.org/maven2/")
     }
 }
 

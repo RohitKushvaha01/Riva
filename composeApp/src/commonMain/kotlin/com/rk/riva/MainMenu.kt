@@ -1,6 +1,7 @@
 package com.rk.riva
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
@@ -28,42 +29,10 @@ fun MainMenu(show: Boolean,onDismissRequest:()-> Unit){
     DropdownMenu(expanded = show, onDismissRequest = {
         onDismissRequest()
     }){
-        Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Top) {
-            //go forward
-            IconButton(
-                enabled = ((TabManager.currentTab as? WebTab)?.getEngine()?.canGoForward?.value == true),
-                onClick = {
-                    onDismissRequest()
-                (TabManager.currentTab as? WebTab)?.getEngine()?.goForward()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.ArrowRight, contentDescription = null)
-            }
-            IconButton(onClick = {
-                onDismissRequest()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Bookmark,contentDescription = null)
-            }
-            //page info
-            IconButton(onClick = {
-                onDismissRequest()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Info,contentDescription = null)
-            }
-            IconButton(onClick = {
-                onDismissRequest()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.Download,contentDescription = null)
-            }
-
-            IconButton(
-                enabled = TabManager.currentTab is WebTab,
-                onClick = {
-                    onDismissRequest()
-                (TabManager.currentTab as? WebTab)?.getEngine()?.refresh()
-            }){
-                Icon(modifier = Modifier.size(20.dp),imageVector = Lucide.RefreshCw,contentDescription = null)
-            }
+        TabManager.currentTab.apply {
+            MenuItems(onDismissRequest)
         }
+
 
         DropdownMenuItem(
             text = { Text("New Tab") },

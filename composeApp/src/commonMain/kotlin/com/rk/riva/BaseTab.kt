@@ -14,5 +14,5 @@ abstract class BaseTab {
     abstract fun onClose()
 
     @Composable
-    abstract fun ColumnScope.MenuItems()
+    abstract fun ColumnScope.MenuItems(onDismissRequest:()->Unit)
 }
